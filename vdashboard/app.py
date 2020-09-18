@@ -22,7 +22,7 @@ def lambda_handler(event, context):
         # Pybossa does a GET on initial setting to validate URL
         # so must acknowledge GET
         return simple_response(200, "200 OK", payload="Ready for webhook.")
-    if "httpMethod" in event and event["httpMethod"] == "PUT":
+    if "httpMethod" in event and event["httpMethod"] == "POST":
         try:
             webhook_data = json.loads(body)
             project_short_name = webhook_data["project_short_name"]
