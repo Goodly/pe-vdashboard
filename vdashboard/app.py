@@ -15,30 +15,33 @@ def lambda_handler(event, context):
     Returns
     ------
     """
+    path = event.get("path", "")
+    headers = event.get("multiValueHeaders", {})
+    body = event.get("body", "")
     if "httpMethod" in event and event["httpMethod"] == "GET":
         # Pybossa does a GET on initial setting to validate URL
         # so must acknowledge GET
-        return simple_response(200, "200 OK")
+        return simple_response(200, "200 OK", payload="Ready for webhook.")
     if "httpMethod" in event and event["httpMethod"] == "PUT":
-        path = event.get("path", "")
-        headers = event["multiValueHeaders"]
-        body = event.get("body", "{}")
         try:
             webhook_data = json.loads(body)
-        except json.decoder.JSONDecodeError:
+            project_short_name = webhook_data["project_short_name"]
+            project_id = webhook_data["project_id"]
+            task_id = webhook_data["task_id"]
+            result_id = webhook_data["result_id"]
+            event = webhook_data["event"]
+        except json.decoder.JSONDecodeError, KeyError:
             return simple_response(400, "Bad Request")
-        if ("project_short_name" in webhook_data and
-            "project_id" in webhook_data and
-            "task_id" in webhook_data and
-            "result_id" in webhook_data and
-            "event" in webhook_data):
-            # Notify external party of webhook
-            return simple_response(200, "200 OK")
+        print("Calling external API.")
+        return simple_response(200, "200 OK", payload="Notification sent.")
     # Shouldn't reach here under normal use.
+    print(path)
+    print(json.dumps(headers))
     print(body)
     return simple_response(400, "Bad Request")
 
 def simple_response(status_code, status_desc, payload=""):
+    print(f"RETURN STATUS CODE: {status_code}")
     return {
         "statusCode": status_code,
         "statusDescription": status_desc,
