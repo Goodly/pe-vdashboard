@@ -1,7 +1,8 @@
 import json
 from hashlib import sha256
-from urllib.request import Request, urlopen
-from urllib.parse import urlencode
+import requests
+from requests.compat import urlencode
+
 import os
 from os import environ
 
@@ -17,18 +18,14 @@ def retrieve_email(userid):
 
     # Construct and call a GET request to public editor to get email given id
     url = f"https://pe.goodlylabs.org/api/user/{userid}?api_key={PE_API_KEY}"
-    req = Request(
-        method="GET",
-        url=url,
-        headers={"Content-Type": "application/json"}
-    )
-    r = urlopen(req)
+
+    req = requests.get(url, headers={"Content-Type": "application/json"})
 
     # error handling
-    if r.status != 200:
-        raise Exception(r.status, r.reason)
+    if req.status_code != 200:
+        raise Exception(req.status_code, req.reason)
 
-    data = json.loads(r.read())
+    data = req.json()
 
     return data["email_addr"]
 
@@ -62,25 +59,21 @@ def record_participation(userid, project_slug):
     email = retrieve_email(userid)
     hashed = sha256(email.encode("utf8")).hexdigest()
 
-    req = Request(
-        method="POST",
-        url="https://scistarter.org/api/participation/hashed/" +
-            project_slug + "?key=" + environ["SCISTARTER_API_KEY"],
-        data=urlencode(
-            {
-                "hashed": hashed,
-                "type": "classification",  # other options: 'collection', 'signup'
-                "duration": 31,  # Seconds the user spent participating, or an estimate
-            }
-            ).encode("utf8"),
-    )
+    url = "https://scistarter.org/api/participation/hashed/" + \
+        project_slug + "?key=" + environ["SCISTARTER_API_KEY"]
 
-    r = urlopen(req)
+    data = {
+        "hashed": hashed,
+        "type": "classification",  # other options: 'collection', 'signup'
+        "duration": 31,  # Seconds the user spent participating, or an estimate
+    }
 
-    if r.status != 200:
-        raise Exception(r.status, r.reason)
+    req = requests.post(url=url, data=urlencode(data).encode("utf8"))
 
-    return json.loads(r.read())
+    if req.status != 200:
+        raise Exception(req.status_code, req.reason)
+
+    return req.json()
 
 
 if __name__ == "__main__":
