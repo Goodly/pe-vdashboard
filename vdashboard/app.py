@@ -30,7 +30,7 @@ def lambda_handler(event, context):
             task_id = webhook_data["task_id"]
             result_id = webhook_data["result_id"]
             event = webhook_data["event"]
-        except json.decoder.JSONDecodeError, KeyError:
+        except (json.decoder.JSONDecodeError, KeyError):
             return simple_response(400, "Bad Request")
         print("Calling external API.")
         return simple_response(200, "200 OK", payload="Notification sent.")
