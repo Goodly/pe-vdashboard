@@ -2,39 +2,49 @@ import json
 
 
 def lambda_handler(event, context):
-    """Sample pure Lambda function
+    """Handle a Pybossa webhook
 
     Parameters
     ----------
     event: dict, required
-        API Gateway Lambda Proxy Input Format
-
-        Event doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-input-format
 
     context: object, required
         Lambda Context runtime methods and attributes
-
         Context doc: https://docs.aws.amazon.com/lambda/latest/dg/python-context-object.html
 
     Returns
     ------
-    API Gateway Lambda Proxy Output Format: dict
-
-        Return doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html
     """
+    if "httpMethod" in event and event["httpMethod"] == "GET":
+        # Pybossa does a GET on initial setting to validate URL
+        # so must acknowledge GET
+        return simple_response(200, "200 OK")
+    if "httpMethod" in event and event["httpMethod"] == "PUT":
+        path = event.get("path", "")
+        headers = event["multiValueHeaders"]
+        body = event.get("body", "{}")
+        try:
+            webhook_data = json.loads(body)
+        except json.decoder.JSONDecodeError:
+            return simple_response(400, "Bad Request")
+        if ("project_short_name" in webhook_data and
+            "project_id" in webhook_data and
+            "task_id" in webhook_data and
+            "result_id" in webhook_data and
+            "event" in webhook_data):
+            # Notify external party of webhook
+            return simple_response(200, "200 OK")
+    # Shouldn't reach here under normal use.
+    print(body)
+    return simple_response(400, "Bad Request")
 
-    # try:
-    #     ip = requests.get("http://checkip.amazonaws.com/")
-    # except requests.RequestException as e:
-    #     # Send some context about this error to Lambda Logs
-    #     print(e)
-
-    #     raise e
-
+def simple_response(status_code, status_desc, payload=""):
     return {
-        "statusCode": 200,
-        "body": json.dumps({
-            "message": "hello world",
-            # "location": ip.text.replace("\n", "")
-        }),
+        "statusCode": status_code,
+        "statusDescription": status_desc,
+        "multiValueHeaders": {
+            "Content-Type": ["text/plain; charset=utf-8"],
+        },
+        "isBase64Encoded": False,
+        "body": payload
     }
