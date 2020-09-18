@@ -58,7 +58,7 @@ Resources:
     Properties:
       PrimaryKey:
         Name: id
-        Type: BigInteger
+        Type: Number
       ProvisionedThroughput:
         ReadCapacityUnits: 2
         WriteCapacityUnits: 2
