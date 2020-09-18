@@ -1,0 +1,35 @@
+{
+  "requestContext": {
+    "elb": {
+      "targetGroupArn": "arn:aws:elasticloadbalancing:us-west-2:507444306670:targetgroup/webhook-public-editor/0205eeff649a7b9c"
+    }
+  },
+  "httpMethod": "GET",
+  "path": "/project/covid19",
+  "multiValueQueryStringParameters": {},
+  "multiValueHeaders": {
+    "accept": [
+      "*/*"
+    ],
+    "host": [
+      "webhook.publiceditor.io"
+    ],
+    "user-agent": [
+      "curl/7.58.0"
+    ],
+    "x-amzn-trace-id": [
+      "Root=1-5f63b722-82f96f503154ff38c9a30128"
+    ],
+    "x-forwarded-for": [
+      "54.203.105.95"
+    ],
+    "x-forwarded-port": [
+      "443"
+    ],
+    "x-forwarded-proto": [
+      "https"
+    ]
+  },
+  "body": "",
+  "isBase64Encoded": true
+}

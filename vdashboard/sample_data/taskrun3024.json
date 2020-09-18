@@ -1,0 +1,20 @@
+{
+  "info": {
+  },
+  "external_uid": null,
+  "user_id": 162,
+  "links": [
+    "<link rel='parent' title='project' href='https://pe.goodlylabs.org/api/project/127'/>",
+    "<link rel='parent' title='task' href='https://pe.goodlylabs.org/api/task/1365'/>"
+  ],
+  "task_id": 1365,
+  "created": "2018-10-20T01:22:10.539068",
+  "finish_time": "2018-10-20T01:40:04.846458",
+  "calibration": null,
+  "user_ip": null,
+  "link": "<link rel='self' title='taskrun' href='https://pe.goodlylabs.org/api/taskrun/3024'/>",
+  "timeout": null,
+  "project_id": 127,
+  "id": 3024,
+  "media_url": null
+}
