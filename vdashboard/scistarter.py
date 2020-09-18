@@ -1,4 +1,5 @@
 import json
+import iso8601
 from hashlib import sha256
 import requests
 from requests.compat import urlencode
@@ -7,17 +8,17 @@ import os
 from os import environ
 
 
-def retrieve_email(userid):
+def retrieve_email(user_id):
     """ 
 
-    Input: A userid mapping to some User Profile in Public Editor
+    Input: A user_id mapping to some User Profile in Public Editor
     Output: The email that belongs to the user with the userid input
 
     """
     PE_API_KEY = environ["PE_API_KEY"]
 
     # Construct and call a GET request to public editor to get email given id
-    url = f"https://pe.goodlylabs.org/api/user/{userid}?api_key={PE_API_KEY}"
+    url = f"https://pe.goodlylabs.org/api/user/{user_id}?api_key={PE_API_KEY}"
 
     req = requests.get(url, headers={"Content-Type": "application/json"})
 
@@ -30,7 +31,27 @@ def retrieve_email(userid):
     return data["email_addr"]
 
 
-def record_participation(userid, project_slug):
+def retrieve_taskrun(taskrun_id):
+    """ 
+
+    Input: A taskrun_id mapping to some Taskrun in Public Editor
+    Output: A json representing the data of a taskrun instance
+
+    """
+    PE_API_KEY = environ["PE_API_KEY"]
+
+    url = f"https://pe.goodlylabs.org/api/taskrun/{taskrun_id}?api_key={PE_API_KEY}"
+    req = requests.get(url, headers={"Content-Type": "application/json"})
+
+    # error handling
+    if req.status_code != 200:
+        raise Exception(req.status_code, req.reason)
+
+    data = req.json()
+    return data
+
+
+def record_participation(taskrun_id, project_slug):
     """ 
 
     Input: A userid mapping to some User Profile in Public Editor, A project_slug representing a unique project on SciStarter
@@ -56,20 +77,30 @@ def record_participation(userid, project_slug):
 
     """
 
-    email = retrieve_email(userid)
+    # retrieve necessary data from a specific taskrun
+    taskrun_json = retrieve_taskrun(taskrun_id)
+
+    # calculate the total seconds user spent on task
+    pybossa_created = iso8601.parse_date(taskrun_json.get('created'))
+    pybossa_finish_time = iso8601.parse_date(taskrun_json.get('finish_time'))
+    elapsed_time = pybossa_finish_time - pybossa_created
+    total_seconds = int(elapsed_time.total_seconds())
+
+    # retrieve email from user_id and hash the email
+    email = retrieve_email(taskrun_json.get('user_id'))
     hashed = sha256(email.encode("utf8")).hexdigest()
 
+    # construct parameters for POST request to SciStarter
     url = "https://scistarter.org/api/participation/hashed/" + \
         project_slug + "?key=" + environ["SCISTARTER_API_KEY"]
 
     data = {
         "hashed": hashed,
         "type": "classification",  # other options: 'collection', 'signup'
-        "duration": 31,  # Seconds the user spent participating, or an estimate
+        "duration": total_seconds,  # Seconds the user spent participating, or an estimate
     }
 
     req = requests.post(url=url, data=urlencode(data).encode("utf8"))
-
     if req.status != 200:
         raise Exception(req.status_code, req.reason)
 
@@ -77,4 +108,4 @@ def record_participation(userid, project_slug):
 
 
 if __name__ == "__main__":
-    print(record_participation(input("User ID: "), input("Project slug: ")))
+    print(record_participation(input("TaskRun ID: "), input("Project slug: ")))
