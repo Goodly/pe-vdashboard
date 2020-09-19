@@ -1,12 +1,14 @@
+import os
+
 import json
 import iso8601
 from hashlib import sha256
 import requests
 from requests.compat import urlencode
 
-import os
-from os import environ
 
+PYBOSSA_API_KEY = os.environ.get("PYBOSSA_API_KEY")
+SCISTARTER_API_KEY = os.environ.get("SCISTARTER_API_KEY")
 
 def retrieve_email(user_id):
     """ 
@@ -15,10 +17,9 @@ def retrieve_email(user_id):
     Output: The email that belongs to the user with the userid input
 
     """
-    PE_API_KEY = environ["PE_API_KEY"]
 
     # Construct and call a GET request to public editor to get email given id
-    url = f"https://pe.goodlylabs.org/api/user/{user_id}?api_key={PE_API_KEY}"
+    url = f"https://pe.goodlylabs.org/api/user/{user_id}?api_key={PYBOSSA_API_KEY}"
 
     req = requests.get(url, headers={"Content-Type": "application/json"})
 
@@ -38,9 +39,8 @@ def retrieve_taskrun(taskrun_id):
     Output: A json representing the data of a taskrun instance
 
     """
-    PE_API_KEY = environ["PE_API_KEY"]
 
-    url = f"https://pe.goodlylabs.org/api/taskrun/{taskrun_id}?api_key={PE_API_KEY}"
+    url = f"https://pe.goodlylabs.org/api/taskrun/{taskrun_id}?api_key={PYBOSSA_API_KEY}"
     req = requests.get(url, headers={"Content-Type": "application/json"})
 
     # error handling
@@ -92,7 +92,7 @@ def record_participation(taskrun_id, project_slug):
 
     # construct parameters for POST request to SciStarter
     url = "https://scistarter.org/api/participation/hashed/" + \
-        project_slug + "?key=" + environ["SCISTARTER_API_KEY"]
+        project_slug + "?key=" + SCISTARTER_API_KEY
 
     data = {
         "hashed": hashed,
