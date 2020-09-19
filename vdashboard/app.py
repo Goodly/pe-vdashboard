@@ -45,8 +45,11 @@ def lambda_handler(event, context):
                 f"Notified of taskrun {taskrun_id} "
                 f"by user {user_id} in project {project_short_name}"
             )
-            record_participation(taskrun_id, project_slug)
-            return simple_response(200, "200 OK", payload="Notification sent.")
+            try:
+                record_participation(taskrun_id, project_slug)
+                return simple_response(200, "200 OK", payload="Notification sent.")
+            except Exception as e:
+                return simple_response(400, "Bad Request", payload=str(e))
         else:
             return simple_response(400, "Bad Request", payload="Webhook did not provide taskrun_id.")
     # Shouldn't reach here under normal use.
