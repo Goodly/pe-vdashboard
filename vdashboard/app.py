@@ -44,7 +44,8 @@ def lambda_handler(event, context):
         if taskrun_id != -1:
             print(
                 f"Notified of taskrun {taskrun_id} "
-                f"by user {user_id} in project {project_short_name}"
+                f"by user {user_id} in project {project_short_name}. "
+                f"Crediting to SciStarter project {project_slug}."
             )
             try:
                 record_participation(taskrun_id, project_slug)
