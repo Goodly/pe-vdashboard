@@ -101,7 +101,7 @@ def record_participation(taskrun_id, project_slug):
     }
 
     req = requests.post(url=url, data=urlencode(data).encode("utf8"))
-    if req.status != 200:
+    if req.status_code != 200:
         raise Exception(req.status_code, req.reason)
 
     return req.json()
