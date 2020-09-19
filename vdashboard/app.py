@@ -36,6 +36,7 @@ def lambda_handler(event, context):
             task_id = webhook_data["task_id"]
             # taskrun_id is only provided by a patched version of Pybossa
             taskrun_id = int(webhook_data.get("taskrun_id", -1))
+            user_id = int(webhook_data.get("user_id", -1))
             result_id = webhook_data["result_id"]
             event = webhook_data["event"]
         except (json.decoder.JSONDecodeError, KeyError, ValueError, TypeError):
