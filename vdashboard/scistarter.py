@@ -21,13 +21,13 @@ def retrieve_email(user_id):
     # Construct and call a GET request to public editor to get email given id
     url = f"https://pe.goodlylabs.org/api/user/{user_id}?api_key={PYBOSSA_API_KEY}"
 
-    req = requests.get(url, headers={"Content-Type": "application/json"})
+    response = requests.get(url, headers={"Content-Type": "application/json"})
 
     # error handling
-    if req.status_code != 200:
-        raise Exception(req.status_code, req.reason)
+    if response.status_code != 200:
+        raise Exception(response.status_code, response.reason)
 
-    data = req.json()
+    data = response.json()
 
     return data["email_addr"]
 
@@ -41,13 +41,13 @@ def retrieve_taskrun(taskrun_id):
     """
 
     url = f"https://pe.goodlylabs.org/api/taskrun/{taskrun_id}?api_key={PYBOSSA_API_KEY}"
-    req = requests.get(url, headers={"Content-Type": "application/json"})
+    response = requests.get(url, headers={"Content-Type": "application/json"})
 
     # error handling
-    if req.status_code != 200:
-        raise Exception(req.status_code, req.reason)
+    if response.status_code != 200:
+        raise Exception(response.status_code, response.reason)
 
-    data = req.json()
+    data = response.json()
     return data
 
 
@@ -100,11 +100,11 @@ def record_participation(taskrun_id, project_slug):
         "duration": total_seconds,  # Seconds the user spent participating, or an estimate
     }
 
-    req = requests.post(url=url, data=urlencode(data).encode("utf8"))
-    if req.status_code != 200:
-        raise Exception(req.status_code, req.reason)
+    response = requests.post(url=url, data=urlencode(data).encode("utf8"))
+    if response.status_code != 200:
+        raise Exception(response.status_code, response.reason)
 
-    return req.json()
+    return response.json()
 
 
 if __name__ == "__main__":
