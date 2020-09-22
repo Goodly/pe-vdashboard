@@ -100,7 +100,7 @@ def record_participation(taskrun_id, project_slug):
         "duration": total_seconds,  # Seconds the user spent participating, or an estimate
     }
 
-    response = requests.post(url=url, data=urlencode(data).encode("utf8"))
+    response = requests.post(url=url, data=data)
     if response.status_code != 200:
         raise Exception(response.status_code, response.reason)
 
